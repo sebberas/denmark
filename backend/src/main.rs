@@ -7,7 +7,7 @@ async fn main() -> anyhow::Result<()> {
 
     telemetry::init();
 
-    tracing::info!("hello world!");
+    bbr::get_ejendom_relations().await?;
 
     Ok(())
 }
