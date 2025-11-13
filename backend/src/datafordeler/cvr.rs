@@ -166,6 +166,15 @@ pub async fn download_virksomhed_list(client: &Client) -> anyhow::Result<Vec<Vir
     Ok(serde_json::from_value(contents)?)
 }
 
+#[tracing::instrument(skip(client))]
+pub async fn download_produktionsenhed_list(client: &Client) -> anyhow::Result<JsonValue> {
+    download_file(
+        client,
+        "CVR_V1_Produktionsenhed_TotalDownload_json_Current_193.zip",
+    )
+    .await
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -15,9 +15,9 @@ async fn main() -> anyhow::Result<()> {
 
     let client = Client::new();
 
-    let virksomhed = cvr::download_virksomhed_list(&client).await?;
+    let produktionsenhed = cvr::download_produktionsenhed_list(&client).await?;
 
-    fs::write("data/virksomhed.json", serde_json::to_string_pretty(&virksomhed)?).await?;
+    fs::write("data/produktionsenhed.json", serde_json::to_string_pretty(&produktionsenhed)?).await?;
 
     /*
     let list = cvr::download_branche_list(&client).await?;
