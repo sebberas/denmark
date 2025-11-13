@@ -72,7 +72,7 @@ pub async fn download_navn_list(client: &Client) -> anyhow::Result<Vec<NavnRecor
 #[serde(rename_all = "lowercase")]
 pub enum EnhedStatus {
     Aktiv,
-    Inaktiv
+    Inaktiv,
 }
 
 #[derive(Debug, Deserialize, PartialEq, Eq, Hash, Serialize)]
@@ -99,8 +99,8 @@ pub enum EnhedForretningsnoegletype {
     #[serde(rename = "pNummer")]
     PNummer,
     #[serde(rename = "CVREnhedsId")]
-    CvrEnhedsId
-} 
+    CvrEnhedsId,
+}
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -166,13 +166,52 @@ pub async fn download_virksomhed_list(client: &Client) -> anyhow::Result<Vec<Vir
     Ok(serde_json::from_value(contents)?)
 }
 
+#[derive(Debug, Deserialize, Serialize)]
+pub enum ProduktionsenhedFelt {
+    Oprettet,
+    Aendret,
+    Ophoert,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "lowercase")]
+pub enum ProduktionsenhedStatus {
+    Aktiv,
+    Inaktiv,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ProduktionsenhedRecord {
+    datafordeler_opdateringstid: Option<DateTime<Utc>>,
+    feltliste: ProduktionsenhedFelt,
+    id: String,
+    p_nummer: NonZeroU64,
+    produktionsenhed_ophoersdato: Option<NaiveDate>,
+    produktionsenhed_startdato: NaiveDate,
+    registrering_fra: DateTime<Utc>,
+    registrering_til: Option<DateTime<Utc>>,
+    registreringsaktoer: String,
+    status: ProduktionsenhedStatus,
+    tilknyttet_til_virksomhed_ophoersdato: Option<NaiveDate>,
+    tilknyttet_til_virksomhed_startdato: NaiveDate,
+    #[serde(rename = "tilknyttetVirksomhedsCVRNummer")]
+    tilknyttet_virksomheds_cvr_nummer: NonZeroU64,
+    virkning_fra: NaiveDate,
+    virkning_til: Option<NaiveDate>,
+    virkningsaktoer: String,
+}
+
 #[tracing::instrument(skip(client))]
-pub async fn download_produktionsenhed_list(client: &Client) -> anyhow::Result<JsonValue> {
-    download_file(
+pub async fn download_produktionsenhed_list(
+    client: &Client,
+) -> anyhow::Result<Vec<ProduktionsenhedRecord>> {
+    let contents = download_file(
         client,
         "CVR_V1_Produktionsenhed_TotalDownload_json_Current_193.zip",
     )
-    .await
+    .await?;
+    Ok(serde_json::from_value(contents)?)
 }
 
 #[tracing::instrument(skip(client))]
