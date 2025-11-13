@@ -4,7 +4,6 @@ use ::tokio::fs;
 pub use datafordeler::*;
 
 pub mod telemetry;
-pub mod bbr;
 pub mod datafordeler;
 
 
@@ -17,8 +16,10 @@ async fn main() -> anyhow::Result<()> {
     let client = Client::new();
 
     let list = cvr::download_branche_list(&client).await?;
+    let bbr = bbr::download_ejendom_relation(&client).await?;
 
     fs::write("list.json", serde_json::to_string_pretty(&list)?).await?;
+    fs::write("bbr.json", serde_json::to_string_pretty(&bbr)?).await?;
 
     Ok(())
 }

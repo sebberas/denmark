@@ -5,6 +5,7 @@ use ::serde_json::{Value as JsonValue};
 use ::anyhow::anyhow;
 use ::reqwest::Client;
 use ::reqwest::StatusCode;
+use ::chrono::{DateTime, Utc};
 
 const BASE_URL: &str = "https://api.datafordeler.dk/FileDownloads/GetFile";
 
@@ -12,7 +13,11 @@ const BASE_URL: &str = "https://api.datafordeler.dk/FileDownloads/GetFile";
 #[tracing::instrument(skip(client))]
 pub async fn download_file(client: &Client, filename: &str) -> anyhow::Result<JsonValue> {
     let url = format!("{BASE_URL}?Filename={filename}&apikey={}", env::var("DATAFORDELER_API_KEY")?);
+    let now = Utc::now();
+    
+    
     let request = client.get(url);
+
     let response = request.send().await?;
 
     match response.status() {
