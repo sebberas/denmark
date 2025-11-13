@@ -1,9 +1,42 @@
 use ::serde_json::{Value as JsonValue};
 use ::serde::{Deserialize, Serialize};
 use ::reqwest::Client;
-use ::chrono::{DateTime, Utc};
+use ::chrono::{DateTime, Utc, NaiveDate};
+use ::std::num::NonZeroU64;
 
 use super::download_file;
+
+#[derive(Debug, Deserialize, Serialize)]
+enum VirksomhedsFeltliste {
+    Aendret,
+    Oprettet,
+    Ophoert,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "lowercase")]
+enum VirksomhedsStatus {
+    Aktiv,
+    Inaktiv,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct VirksomhedRecord {
+    #[serde(rename = "CVRNummer")]
+    cvr_nummer: NonZeroU64,
+    datafordeler_opdateringstid: Option<DateTime<Utc>>,
+    feltliste: VirksomhedsFeltliste,
+    id: String,
+    registrering_fra: DateTime<Utc>,
+    registrering_til: Option<DateTime<Utc>>,
+    status: VirksomhedsStatus,
+    virkning_fra: NaiveDate,
+    virkning_til: Option<NaiveDate>,
+    virkningsaktoer: String,
+    virksomhed_ophoersdato: Option<NaiveDate>,
+    virksomhed_startdato: NaiveDate,
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deserialize, Serialize)]
 pub enum BrancheFelt {
