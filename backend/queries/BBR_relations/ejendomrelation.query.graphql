@@ -1,0 +1,16 @@
+query BbrEjendomRelationQuery {
+  BBR_Ejendomsrelation(
+    virkningstid: "2025-11-13T11:03:06.393Z"
+    registreringstid: "2025-11-13T11:03:06.393Z"
+  ) {
+    pageInfo {
+      endCursor
+      hasNextPage
+    }
+    nodes {
+      ejendomstype
+      ejendomsnummer
+      status
+    }
+  }
+}
