@@ -3,6 +3,7 @@ name = "backend"
 edition = "2024"
 
 [dependencies]
+anyhow = "1.0.100"
 dotenvy = {version = "0.15.7"}
 graphql_client = {version = "0.14.0"}
 serde = { version = "1.0.228", features = ["derive"] }
