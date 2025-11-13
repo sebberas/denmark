@@ -1,5 +1,6 @@
 pub mod telemetry;
 pub mod bbr;
+pub mod cvr;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
