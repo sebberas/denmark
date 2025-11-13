@@ -175,6 +175,15 @@ pub async fn download_produktionsenhed_list(client: &Client) -> anyhow::Result<J
     .await
 }
 
+#[tracing::instrument(skip(client))]
+pub async fn download_adressering_list(client: &Client) -> anyhow::Result<JsonValue> {
+    download_file(
+        client,
+        "CVR_V1_Adressering_TotalDownload_json_Current_193.zip",
+    )
+    .await
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
