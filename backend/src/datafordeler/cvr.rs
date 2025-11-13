@@ -1,10 +1,81 @@
-use ::serde_json::{Value as JsonValue};
-use ::serde::{Deserialize, Serialize};
+use ::chrono::{DateTime, NaiveDate, Utc};
 use ::reqwest::Client;
-use ::chrono::{DateTime, Utc, NaiveDate};
+use ::serde::{Deserialize, Serialize};
+use ::serde_json::Value as JsonValue;
 use ::std::num::NonZeroU64;
 
 use super::download_file;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deserialize, Serialize)]
+pub enum BrancheFelt {
+    Oprettet,
+    Aendret,
+    Ophoert,
+}
+
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct BrancheRecord {
+    #[serde(rename = "CVREnhedsId")]
+    cvr_enheds_id: String,
+    datafordeler_opdateringstid: DateTime<Utc>,
+    feltliste: BrancheFelt,
+    registrering_fra: DateTime<Utc>,
+    registrering_til: Option<DateTime<Utc>>,
+    registreringsaktoer: String,
+    sekvens: u64,
+    vaerdi: String,
+    vaerdi_tekst: String,
+    virkning_fra: DateTime<Utc>,
+    virkning_til: Option<DateTime<Utc>>,
+    virkningsaktoer: String,
+}
+
+#[tracing::instrument(skip(client))]
+pub async fn download_branche_list(client: &Client) -> anyhow::Result<Vec<BrancheRecord>> {
+    let contents =
+        download_file(client, "CVR_V1_Branche_TotalDownload_json_Current_193.zip").await?;
+    Ok(serde_json::from_value(contents)?)
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deserialize, Serialize)]
+pub enum NavnFelt {
+    Oprettet,
+    Aendret,
+    Ophoert,
+}
+
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct NavnRecord {
+    #[serde(rename = "CVREnhedsId")]
+    cvr_enheds_id: String,
+    datafordeler_opdateringstid: DateTime<Utc>,
+    feltliste: NavnFelt,
+    registrering_fra: DateTime<Utc>,
+    registrering_til: Option<DateTime<Utc>>,
+    registreringsaktoer: String,
+    sekvens: u64,
+    vaerdi: String,
+    virkning_fra: DateTime<Utc>,
+    virkning_til: Option<DateTime<Utc>>,
+    virkningsaktoer: String,
+}
+
+#[tracing::instrument(skip(client))]
+pub async fn download_navn_list(client: &Client) -> anyhow::Result<Vec<NavnRecord>> {
+    let contents = download_file(client, "CVR_V1_Navn_TotalDownload_json_Current_193.zip").await?;
+    Ok(serde_json::from_value(contents)?)
+}
+
+#[tracing::instrument(skip(client))]
+pub async fn download_enhed_list(client: &Client) -> anyhow::Result<JsonValue> {
+    download_file(
+        client,
+        "CVR_V1_CVREnhed_TotalDownload_json_Bitemporal_193.zip",
+    )
+    .await
+}
 
 #[derive(Debug, Deserialize, Serialize)]
 enum VirksomhedsFeltliste {
@@ -38,74 +109,14 @@ pub struct VirksomhedRecord {
     virksomhed_startdato: NaiveDate,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deserialize, Serialize)]
-pub enum BrancheFelt {
-    Oprettet,
-    Aendret,
-    Ophoert,
-}
-
-#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct BrancheRecord {
-    #[serde(rename = "CVREnhedsId")]
-    cvr_enheds_id: String,
-    datafordeler_opdateringstid: DateTime<Utc>,
-    feltliste: BrancheFelt,
-    registrering_fra: DateTime<Utc>,
-    registrering_til: Option<DateTime<Utc>>,
-    registreringsaktoer: String,
-    sekvens: u64,
-    vaerdi: String,
-    vaerdi_tekst: String,
-    virkning_fra: DateTime<Utc>,
-    virkning_til: Option<DateTime<Utc>>,
-    virkningsaktoer: String,
-}
-
 #[tracing::instrument(skip(client))]
-pub async fn download_branche_list(client: &Client) -> anyhow::Result<Vec<BrancheRecord>> {
-    let contents = download_file(client, "CVR_V1_Branche_TotalDownload_json_Current_193.zip").await?;
+pub async fn download_virksomhed_list(client: &Client) -> anyhow::Result<Vec<VirksomhedRecord>> {
+    let contents = download_file(
+        client,
+        "CVR_V1_Virksomhed_TotalDownload_json_Current_193.zip",
+    )
+    .await?;
     Ok(serde_json::from_value(contents)?)
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deserialize, Serialize)]
-pub enum NavnFelt {
-    Oprettet,
-    Aendret,
-    Ophoert,
-}
-
-#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct NavnRecord {
-    #[serde(rename = "CVREnhedsId")]
-    cvr_enheds_id: String,
-    datafordeler_opdateringstid: DateTime<Utc>,
-    feltliste: NavnFelt,
-    registrering_fra: DateTime<Utc>,
-    registrering_til: Option<DateTime<Utc>>,
-    registreringsaktoer: String,
-    sekvens: u64,
-    vaerdi: String,
-    virkning_fra: DateTime<Utc>,
-    virkning_til: Option<DateTime<Utc>>,
-    virkningsaktoer: String,
-}
-
-#[tracing::instrument(skip(client))]
-pub async fn download_navn_list(client: &Client) -> anyhow::Result<JsonValue> {
-    download_file(client, "CVR_V1_Navn_TotalDownload_json_Current_193.zip").await
-}
-
-#[tracing::instrument(skip(client))]
-pub async fn download_enhed_list(client: &Client) -> anyhow::Result<JsonValue> {
-    download_file(client, "CVR_V1_CVREnhed_TotalDownload_json_Bitemporal_193.zip").await
-}
-
-#[tracing::instrument(skip(client))]
-pub async fn download_virksomhed_list(client: &Client) -> anyhow::Result<JsonValue> {
-    download_file(client, "CVR_V1_Virksomhed_TotalDownload_json_Current_193.zip").await
 }
 
 #[cfg(test)]
