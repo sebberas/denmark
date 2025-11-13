@@ -36,6 +36,30 @@ pub async fn download_branche_list(client: &Client) -> anyhow::Result<Vec<Branch
     Ok(serde_json::from_value(contents)?)
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deserialize, Serialize)]
+pub enum NavnFelt {
+    Oprettet,
+    Aendret,
+    Ophoert,
+}
+
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct NavnRecord {
+    #[serde(rename = "CVREnhedsId")]
+    cvr_enheds_id: String,
+    datafordeler_opdateringstid: DateTime<Utc>,
+    feltliste: NavnFelt,
+    registrering_fra: DateTime<Utc>,
+    registrering_til: Option<DateTime<Utc>>,
+    registreringsaktoer: String,
+    sekvens: u64,
+    vaerdi: String,
+    virkning_fra: DateTime<Utc>,
+    virkning_til: Option<DateTime<Utc>>,
+    virkningsaktoer: String,
+}
+
 #[tracing::instrument(skip(client))]
 pub async fn download_navn_list(client: &Client) -> anyhow::Result<JsonValue> {
     download_file(client, "CVR_V1_Navn_TotalDownload_json_Current_193.zip").await
