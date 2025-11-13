@@ -15,11 +15,17 @@ async fn main() -> anyhow::Result<()> {
 
     let client = Client::new();
 
+    let virksomhed = cvr::download_virksomhed_list(&client).await?;
+
+    fs::write("data/virksomhed.json", serde_json::to_string_pretty(&virksomhed)?).await?;
+
+    /*
     let list = cvr::download_branche_list(&client).await?;
     let bbr = bbr::download_ejendom_relation(&client).await?;
 
     fs::write("list.json", serde_json::to_string_pretty(&list)?).await?;
     fs::write("bbr.json", serde_json::to_string_pretty(&bbr)?).await?;
+     */
 
     Ok(())
 }

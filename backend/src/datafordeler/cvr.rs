@@ -18,6 +18,11 @@ pub async fn download_enhed_list(client: &Client) -> anyhow::Result<JsonValue> {
     download_file(client, "CVR_V1_CVREnhed_TotalDownload_json_Bitemporal_193.zip").await
 }
 
+#[tracing::instrument(skip(client))]
+pub async fn download_virksomhed_list(client: &Client) -> anyhow::Result<JsonValue> {
+    download_file(client, "CVR_V1_Virksomhed_TotalDownload_json_Current_193.zip").await
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
