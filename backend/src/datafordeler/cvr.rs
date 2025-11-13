@@ -68,13 +68,60 @@ pub async fn download_navn_list(client: &Client) -> anyhow::Result<Vec<NavnRecor
     Ok(serde_json::from_value(contents)?)
 }
 
+#[derive(Debug, Deserialize, PartialEq, Eq, Hash, Serialize)]
+#[serde(rename_all = "lowercase")]
+pub enum EnhedStatus {
+    Aktiv,
+    Inaktiv
+}
+
+#[derive(Debug, Deserialize, PartialEq, Eq, Hash, Serialize)]
+pub enum EnhedFelt {
+    Oprettet,
+    Aendret,
+    Ophoert,
+}
+
+#[derive(Debug, Deserialize, PartialEq, Eq, Hash, Serialize)]
+pub enum EnhedsType {
+    Virksomhed,
+    Produktionsenhed,
+    #[serde(rename = "CVRPerson")]
+    CvrPerson,
+    AndreDeltagerePerson,
+    AndreDeltagereVirksomhed,
+}
+
+#[derive(Debug, Deserialize, PartialEq, Eq, Hash, Serialize)]
+pub enum EnhedForretningsnoegletype {
+    #[serde(rename = "CVRNummer")]
+    CvrNummer,
+    #[serde(rename = "pNummer")]
+    PNummer,
+    #[serde(rename = "CVREnhedsId")]
+    CvrEnhedsId
+} 
+
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct EnhedRecord {
+    pub id: String,
+    pub enheds_type: EnhedsType,
+    pub feltliste: EnhedFelt,
+    pub forretningsnoegle: String,
+    pub forretningsnoegletype: EnhedForretningsnoegletype,
+    pub status: EnhedStatus,
+}
+
 #[tracing::instrument(skip(client))]
-pub async fn download_enhed_list(client: &Client) -> anyhow::Result<JsonValue> {
-    download_file(
+pub async fn download_enhed_list(client: &Client) -> anyhow::Result<Vec<EnhedRecord>> {
+    let contents = download_file(
         client,
         "CVR_V1_CVREnhed_TotalDownload_json_Bitemporal_193.zip",
     )
-    .await
+    .await?;
+
+    Ok(serde_json::from_value(contents)?)
 }
 
 #[derive(Debug, Deserialize, Serialize)]
