@@ -17,18 +17,18 @@ pub enum BrancheFelt {
 #[serde(rename_all = "camelCase")]
 pub struct BrancheRecord {
     #[serde(rename = "CVREnhedsId")]
-    cvr_enheds_id: String,
-    datafordeler_opdateringstid: DateTime<Utc>,
-    feltliste: BrancheFelt,
-    registrering_fra: DateTime<Utc>,
-    registrering_til: Option<DateTime<Utc>>,
-    registreringsaktoer: String,
-    sekvens: u64,
-    vaerdi: String,
-    vaerdi_tekst: String,
-    virkning_fra: DateTime<Utc>,
-    virkning_til: Option<DateTime<Utc>>,
-    virkningsaktoer: String,
+    pub cvr_enheds_id: String,
+    pub datafordeler_opdateringstid: DateTime<Utc>,
+    pub feltliste: BrancheFelt,
+    pub registrering_fra: DateTime<Utc>,
+    pub registrering_til: Option<DateTime<Utc>>,
+    pub registreringsaktoer: String,
+    pub sekvens: u64,
+    pub vaerdi: String,
+    pub vaerdi_tekst: String,
+    pub virkning_fra: NaiveDate,
+    pub virkning_til: Option<NaiveDate>,
+    pub virkningsaktoer: String,
 }
 
 #[tracing::instrument(skip(client))]
@@ -49,17 +49,17 @@ pub enum NavnFelt {
 #[serde(rename_all = "camelCase")]
 pub struct NavnRecord {
     #[serde(rename = "CVREnhedsId")]
-    cvr_enheds_id: String,
-    datafordeler_opdateringstid: DateTime<Utc>,
-    feltliste: NavnFelt,
-    registrering_fra: DateTime<Utc>,
-    registrering_til: Option<DateTime<Utc>>,
-    registreringsaktoer: String,
-    sekvens: u64,
-    vaerdi: String,
-    virkning_fra: DateTime<Utc>,
-    virkning_til: Option<DateTime<Utc>>,
-    virkningsaktoer: String,
+    pub cvr_enheds_id: String,
+    pub datafordeler_opdateringstid: DateTime<Utc>,
+    pub feltliste: NavnFelt,
+    pub registrering_fra: DateTime<Utc>,
+    pub registrering_til: Option<DateTime<Utc>>,
+    pub registreringsaktoer: String,
+    pub sekvens: u64,
+    pub vaerdi: String,
+    pub virkning_fra: NaiveDate,
+    pub virkning_til: Option<NaiveDate>,
+    pub virkningsaktoer: String,
 }
 
 #[tracing::instrument(skip(client))]
@@ -125,7 +125,7 @@ pub async fn download_enhed_list(client: &Client) -> anyhow::Result<Vec<EnhedRec
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-enum VirksomhedsFeltliste {
+pub enum VirksomhedsFeltliste {
     Aendret,
     Oprettet,
     Ophoert,
@@ -133,7 +133,7 @@ enum VirksomhedsFeltliste {
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "lowercase")]
-enum VirksomhedsStatus {
+pub enum VirksomhedsStatus {
     Aktiv,
     Inaktiv,
 }
@@ -142,18 +142,18 @@ enum VirksomhedsStatus {
 #[serde(rename_all = "camelCase")]
 pub struct VirksomhedRecord {
     #[serde(rename = "CVRNummer")]
-    cvr_nummer: NonZeroU64,
-    datafordeler_opdateringstid: Option<DateTime<Utc>>,
-    feltliste: VirksomhedsFeltliste,
-    id: String,
-    registrering_fra: DateTime<Utc>,
-    registrering_til: Option<DateTime<Utc>>,
-    status: VirksomhedsStatus,
-    virkning_fra: NaiveDate,
-    virkning_til: Option<NaiveDate>,
-    virkningsaktoer: String,
-    virksomhed_ophoersdato: Option<NaiveDate>,
-    virksomhed_startdato: NaiveDate,
+    pub cvr_nummer: NonZeroU64,
+    pub datafordeler_opdateringstid: Option<DateTime<Utc>>,
+    pub feltliste: VirksomhedsFeltliste,
+    pub id: String,
+    pub registrering_fra: DateTime<Utc>,
+    pub registrering_til: Option<DateTime<Utc>>,
+    pub status: VirksomhedsStatus,
+    pub virkning_fra: NaiveDate,
+    pub virkning_til: Option<NaiveDate>,
+    pub virkningsaktoer: String,
+    pub virksomhed_ophoersdato: Option<NaiveDate>,
+    pub virksomhed_startdato: NaiveDate,
 }
 
 #[tracing::instrument(skip(client))]
@@ -183,23 +183,23 @@ pub enum ProduktionsenhedStatus {
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ProduktionsenhedRecord {
-    datafordeler_opdateringstid: Option<DateTime<Utc>>,
-    feltliste: ProduktionsenhedFelt,
-    id: String,
-    p_nummer: NonZeroU64,
-    produktionsenhed_ophoersdato: Option<NaiveDate>,
-    produktionsenhed_startdato: NaiveDate,
-    registrering_fra: DateTime<Utc>,
-    registrering_til: Option<DateTime<Utc>>,
-    registreringsaktoer: String,
-    status: ProduktionsenhedStatus,
-    tilknyttet_til_virksomhed_ophoersdato: Option<NaiveDate>,
-    tilknyttet_til_virksomhed_startdato: NaiveDate,
+    pub datafordeler_opdateringstid: Option<DateTime<Utc>>,
+    pub feltliste: ProduktionsenhedFelt,
+    pub id: String,
+    pub p_nummer: NonZeroU64,
+    pub produktionsenhed_ophoersdato: Option<NaiveDate>,
+    pub produktionsenhed_startdato: NaiveDate,
+    pub registrering_fra: DateTime<Utc>,
+    pub registrering_til: Option<DateTime<Utc>>,
+    pub registreringsaktoer: String,
+    pub status: ProduktionsenhedStatus,
+    pub tilknyttet_til_virksomhed_ophoersdato: Option<NaiveDate>,
+    pub tilknyttet_til_virksomhed_startdato: NaiveDate,
     #[serde(rename = "tilknyttetVirksomhedsCVRNummer")]
-    tilknyttet_virksomheds_cvr_nummer: NonZeroU64,
-    virkning_fra: NaiveDate,
-    virkning_til: Option<NaiveDate>,
-    virkningsaktoer: String,
+    pub tilknyttet_virksomheds_cvr_nummer: NonZeroU64,
+    pub virkning_fra: NaiveDate,
+    pub virkning_til: Option<NaiveDate>,
+    pub virkningsaktoer: String,
 }
 
 #[tracing::instrument(skip(client))]
